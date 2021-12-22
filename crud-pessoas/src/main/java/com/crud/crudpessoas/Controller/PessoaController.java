@@ -1,5 +1,6 @@
 package com.crud.crudpessoas.Controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import com.crud.Util.CustomError;
 import com.crud.Util.ResourceNotFoundException;
@@ -91,12 +92,21 @@ public class PessoaController {
     }
 
     public int verificarPessoa(Pessoa p) {
-        if (p.getCpf() == null || p.getCpf().length() != 11) {
+        if (p.getCpf() == null || p.getCpf().length() != 11 || !numerico(p.getCpf())) {
             return 1;
         } else if (p.getNome() == null || p.getNome().isEmpty()) {
             return 2;
         }
         return 0;
+    }
+
+    public boolean numerico(String cpf){
+        for(int i = 0; i < cpf.length(); i++) {
+            if(!cpf.substring(i).matches("[0-9]*")){
+                return false;
+            }
+    }
+        return true;
     }
 
 }
