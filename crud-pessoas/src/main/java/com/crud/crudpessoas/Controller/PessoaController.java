@@ -1,5 +1,6 @@
 package com.crud.crudpessoas.Controller;
 
+import org.springframework.web.bind.annotation.CrossOrigin;
 import java.util.ArrayList;
 import java.util.List;
 import com.crud.Util.CustomError;
