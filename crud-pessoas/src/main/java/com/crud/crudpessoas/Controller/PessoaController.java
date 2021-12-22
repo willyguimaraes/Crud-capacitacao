@@ -1,23 +1,17 @@
 package com.crud.crudpessoas.Controller;
 
 import java.util.List;
-import java.util.Optional;
-
 import com.crud.Util.CustomError;
 import com.crud.Util.ResourceNotFoundException;
 import com.crud.crudpessoas.Model.Pessoa;
 import com.crud.crudpessoas.Repository.PessoaRepository;
-import com.crud.crudpessoas.Service.PessoaService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -28,16 +22,17 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class PessoaController {
 
-    PessoaService service;
+    
     PessoaRepository repository;
 
+    //Cadastra uma nova pessoa
     @PostMapping
     public ResponseEntity<?> cadastrarPessoa(@RequestBody Pessoa pessoa, UriComponentsBuilder ucBuilder) {
 
         List<Pessoa> pessoas = repository.findByCpf(pessoa.getCpf());
 
         if (!pessoas.isEmpty()) {
-            return new ResponseEntity<CustomError>(new CustomError("ERRO"), HttpStatus.CONFLICT);
+            return new ResponseEntity<CustomError>(new CustomError("ERRO! Pessoa já cadastrada"), HttpStatus.CONFLICT);
         }
 
         repository.save(pessoa);
@@ -62,28 +57,30 @@ public class PessoaController {
     }
 
     // Exibe todos as pessoas cadastradas.
-    @RequestMapping(value = "Pessoa/listar", method = RequestMethod.GET)
+    @RequestMapping(value = "listar", method = RequestMethod.GET)
     public ResponseEntity<?> listarPessoas() {
 
-        List pessoas = service.findAll();
+        List pessoas = repository.findAll();
 
         return new ResponseEntity<>(pessoas, HttpStatus.OK);
     }
 
     // Exibe uma pessoa cadastrada, pelo seu id.
-    @RequestMapping(value = "Pessoa/exibir/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "exibir/{id}", method = RequestMethod.GET)
     public ResponseEntity<?> consultarPessoa(@PathVariable("id") Long id) {
 
-        Pessoa pessoa = service.findById(id);
+        Pessoa pessoa = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Id não encontrado / cadastrado"));
 
-        return new ResponseEntity<>(pessoa, HttpStatus.OK);
+        return new ResponseEntity<Pessoa>(pessoa, HttpStatus.OK);
     }
 
-    // Exibe uma pessoa cadastrada, pelo seu id.
-    @RequestMapping(value = "Pessoa/deletar/{id}", method = RequestMethod.DELETE)
+    // Deleta uma pessoa cadastrada, pelo seu id.
+    @RequestMapping(value = "deletar/{id}", method = RequestMethod.DELETE)
     public ResponseEntity<?> deletarPessoa(@PathVariable("id") Long id) {
-
-        Pessoa pessoa = service.delete(id);
+        Pessoa pessoa = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Id não encontrado / cadastrado"));
+        repository.delete(pessoa);
 
         return new ResponseEntity<>(pessoa, HttpStatus.OK);
     }
