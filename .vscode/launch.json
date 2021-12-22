@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-CrudPessoasApplication<crud-pessoas>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "mainClass": "com.crud.crudpessoas.CrudPessoasApplication",
+            "projectName": "crud-pessoas",
+            "args": ""
+        }
+    ]
+}

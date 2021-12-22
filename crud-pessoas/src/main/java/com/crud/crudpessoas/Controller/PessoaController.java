@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.crud.Util.CustomError;
+import com.crud.Util.ResourceNotFoundException;
 import com.crud.crudpessoas.Model.Pessoa;
 import com.crud.crudpessoas.Repository.PessoaRepository;
 import com.crud.crudpessoas.Service.PessoaService;
@@ -27,26 +28,13 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class PessoaController {
 
-    
     PessoaService service;
     PessoaRepository repository;
 
-    /**  Cadastra uma nova pessoa.
-    @PostMapping
-    public ResponseEntity<?> cadastrarPessoa(String cpf, String nome, String endereco, String idade, String telefone) {
-        //System.out.println(nome);
-        Pessoa pessoa = service.cadastrarPessoa(cpf, nome, endereco, idade, telefone);
-        //System.out.println(pessoa);
-
-        return new ResponseEntity<>(pessoa, HttpStatus.CREATED);
-    }
-    */
-
- 
     @PostMapping
     public ResponseEntity<?> cadastrarPessoa(@RequestBody Pessoa pessoa, UriComponentsBuilder ucBuilder) {
 
-       List<Pessoa> pessoas = repository.findByCpf(pessoa.getCpf());
+        List<Pessoa> pessoas = repository.findByCpf(pessoa.getCpf());
 
         if (!pessoas.isEmpty()) {
             return new ResponseEntity<CustomError>(new CustomError("ERRO"), HttpStatus.CONFLICT);
@@ -56,16 +44,19 @@ public class PessoaController {
         return new ResponseEntity<Pessoa>(pessoa, HttpStatus.CREATED);
     }
 
-
-
-
-
     // Atualiza os dados de uma pessoa.
-    @RequestMapping(value = "Pessoa/update", method = RequestMethod.PUT)
-    public ResponseEntity<?> updatePessoa(@PathVariable("id") Long id, @RequestParam String cpf, String nome,
-            String endereco, String idade, String telefone) {
+    @RequestMapping(value = "update/{id}", method = RequestMethod.PUT)
+    public ResponseEntity<?> updatePessoa(@PathVariable("id") Long id, @RequestBody Pessoa p) {
 
-        Pessoa pessoa = service.update(id, cpf, nome, endereco, idade, telefone);
+        Pessoa pessoa = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Id não encontrado / cadastrado"));
+
+        pessoa.setCpf(p.getCpf());
+        pessoa.setNome(p.getNome());
+        pessoa.setEndereco(p.getEndereco());
+        pessoa.setidade(p.getidade());
+        pessoa.setTelefone(p.getTelefone());
+        repository.save(pessoa);
 
         return new ResponseEntity<>(pessoa, HttpStatus.OK);
     }
