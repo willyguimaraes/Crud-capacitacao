@@ -22,12 +22,17 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class PessoaController {
 
-    
     PessoaRepository repository;
 
-    //Cadastra uma nova pessoa
+    // Cadastra uma nova pessoa
     @PostMapping
     public ResponseEntity<?> cadastrarPessoa(@RequestBody Pessoa pessoa, UriComponentsBuilder ucBuilder) {
+
+        if (verificarPessoa(pessoa) == 1) {
+            return new ResponseEntity<CustomError>(new CustomError("ERRO! cpf nulo ou invalido"), HttpStatus.CONFLICT);
+        }else if(verificarPessoa(pessoa) == 2){
+            return new ResponseEntity<CustomError>(new CustomError("ERRO! nome não pode ser vazio ou nulo"), HttpStatus.CONFLICT);
+        }
 
         List<Pessoa> pessoas = repository.findByCpf(pessoa.getCpf());
 
@@ -83,6 +88,15 @@ public class PessoaController {
         repository.delete(pessoa);
 
         return new ResponseEntity<>(pessoa, HttpStatus.OK);
+    }
+
+    public int verificarPessoa(Pessoa p) {
+        if (p.getCpf() == null || p.getCpf().length() != 11) {
+            return 1;
+        } else if (p.getNome() == null || p.getNome().isEmpty()) {
+            return 2;
+        }
+        return 0;
     }
 
 }
