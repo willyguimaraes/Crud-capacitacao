@@ -20,13 +20,14 @@ import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/api/pessoa")
+@CrossOrigin
 @AllArgsConstructor
 public class PessoaController {
 
     PessoaRepository repository;
 
     // Cadastra uma nova pessoa
-    @PostMapping
+    @RequestMapping(value = "/cadastra", method = RequestMethod.POST)
     public ResponseEntity<?> cadastrarPessoa(@RequestBody Pessoa pessoa, UriComponentsBuilder ucBuilder) {
 
         if (verificarPessoa(pessoa) == 1) {
@@ -46,7 +47,7 @@ public class PessoaController {
     }
 
     // Atualiza os dados de uma pessoa.
-    @RequestMapping(value = "update/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/atualiza/{id}", method = RequestMethod.PUT)
     public ResponseEntity<?> updatePessoa(@PathVariable("id") Long id, @RequestBody Pessoa p) {
 
         Pessoa pessoa = repository.findById(id)
@@ -63,7 +64,7 @@ public class PessoaController {
     }
 
     // Exibe todos as pessoas cadastradas.
-    @RequestMapping(value = "listar", method = RequestMethod.GET)
+    @RequestMapping(value = "/visualiza", method = RequestMethod.GET)
     public ResponseEntity<?> listarPessoas() {
 
         List pessoas = repository.findAll();
@@ -72,7 +73,7 @@ public class PessoaController {
     }
 
     // Exibe uma pessoa cadastrada, pelo seu id.
-    @RequestMapping(value = "exibir/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/visualiza/{id}", method = RequestMethod.GET)
     public ResponseEntity<?> consultarPessoa(@PathVariable("id") Long id) {
 
         Pessoa pessoa = repository.findById(id)
@@ -82,7 +83,7 @@ public class PessoaController {
     }
 
     // Deleta uma pessoa cadastrada, pelo seu id.
-    @RequestMapping(value = "deletar/{id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/deletar/{id}", method = RequestMethod.DELETE)
     public ResponseEntity<?> deletarPessoa(@PathVariable("id") Long id) {
         Pessoa pessoa = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Id não encontrado / cadastrado"));
